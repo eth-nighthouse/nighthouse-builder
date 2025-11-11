@@ -1,0 +1,16 @@
+diff --git a/beacon_node/beacon_chain/src/custody_context.rs b/beacon_node/beacon_chain/src/custody_context.rs
+index a5ef3ed2f..c38f07a62 100644
+--- a/beacon_node/beacon_chain/src/custody_context.rs
++++ b/beacon_node/beacon_chain/src/custody_context.rs
+@@ -400,6 +400,11 @@ impl<E: EthSpec> CustodyContext<E> {
+         current_slot: Slot,
+         spec: &ChainSpec,
+     ) -> Option<CustodyCountChanged> {
++        // Check if dynamic CGC increase is disabled via environment variable
++        if std::env::var("NIGHTHOUSE_NO_CGC_INCREASE").is_ok() {
++            return None;
++        }
++
+         let Some((effective_epoch, new_validator_custody)) = self
+             .validator_registrations
+             .write()

@@ -6,67 +6,24 @@ import sys
 
 # Default repository mapping for known clients
 DEFAULT_REPOS = {
-    'besu': 'hyperledger/besu',
-    'erigon': 'erigontech/erigon',
-    'ethereumjs': 'ethereumjs/ethereumjs-monorepo',
-    'ethrex': 'lambdaclass/ethrex',
-    'geth': 'ethereum/go-ethereum',
-    'lighthouse': 'sigp/lighthouse',
-    'nimbus-eth2': 'status-im/nimbus-eth2',
-    'nimbus-validator-client': 'status-im/nimbus-eth2',
-    'nimbus-eth1': 'status-im/nimbus-eth1',
-    'prysm-beacon-chain': 'offchainlabs/prysm',
-    'prysm-validator': 'offchainlabs/prysm',
-    'teku': 'consensys/teku',
-    'lodestar': 'chainsafe/lodestar',
-    'reth': 'paradigmxyz/reth',
-    'nethermind': 'nethermindeth/nethermind',
-    'eleel': 'sigp/eleel',
-    'grandine': 'grandinetech/grandine',
-    'flashbots-builder': 'flashbots/builder',
-    'tx-fuzz': 'MariusVanDerWijden/tx-fuzz',
-    'goomy-blob': 'ethpandaops/goomy-blob',
-    'ethereum-genesis-generator': 'ethpandaops/ethereum-genesis-generator',
-    'mev-rs': 'ralexstokes/mev-rs',
-    'reth-rbuilder': 'flashbots/rbuilder',
-    'rustic-builder': 'pawanjay176/rustic-builder',
-    'mev-boost': 'flashbots/mev-boost',
-    'mev-boost-relay': 'flashbots/mev-boost-relay',
-    'goevmlab': 'holiman/goevmlab',
-    'eth-das-guardian': 'probe-lab/eth-das-guardian',
-    'syncoor': 'ethpandaops/syncoor',
-    'zeam': 'blockblaz/zeam',
-    'ream': 'ReamLabs/ream',
-    'meth': 'ethereum/go-ethereum',
-    'nevermind': 'nethermindeth/nethermind',
+    'nighthouse': 'sigp/lighthouse',
     # Add more defaults as needed
 }
 
 # Build argument defaults for special cases
 BUILD_ARGS = {
-    'mev-rs/main-minimal': 'FEATURES=minimal-preset',
-    'reth-rbuilder/develop': 'RBUILDER_BIN=reth-rbuilder'
 }
 
 # Clients that need to have minimal builds created automatically
 MINIMAL_VARIANTS = [
-    'grandine',
-    'mev-rs',
-    'prysm-beacon-chain',
-    'prysm-validator',
-    'nimbus-eth2',
-    'nimbus-validator-client'
 ]
 
 # Clients that need to have sentry builds created automatically
 SENTRY_VARIANTS = [
-    'lighthouse',
-    'nimbus-eth2'
 ]
 
 # Clients that need to have xatu sidecar builds created automatically
 SIDECAR_VARIANTS = [
-    'lighthouse'
 ]
 
 def generate_config():
