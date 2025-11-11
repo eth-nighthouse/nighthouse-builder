@@ -1,8 +1,39 @@
 diff --git a/beacon_node/beacon_chain/src/custody_context.rs b/beacon_node/beacon_chain/src/custody_context.rs
-index a5ef3ed2f..c38f07a62 100644
+index a5ef3ed2f..40bf25f9d 100644
 --- a/beacon_node/beacon_chain/src/custody_context.rs
 +++ b/beacon_node/beacon_chain/src/custody_context.rs
-@@ -400,6 +400,11 @@ impl<E: EthSpec> CustodyContext<E> {
+@@ -89,6 +89,11 @@ impl ValidatorRegistrations {
+         current_slot: Slot,
+         spec: &ChainSpec,
+     ) -> Option<(Epoch, u64)> {
++        // Check if dynamic CGC increase is disabled via environment variable
++        if std::env::var("NIGHTHOUSE_NO_CGC_INCREASE").is_ok() {
++            return None;
++        }
++
+         for (validator_index, effective_balance) in validators_and_balance {
+             self.validators
+                 .insert(validator_index, (current_slot, effective_balance));
+@@ -300,6 +305,9 @@ impl<E: EthSpec> CustodyContext<E> {
+ 
+         let mut custody_count_changed = None;
+ 
++        // Check if dynamic CGC increase is disabled via environment variable
++        let cgc_increase_disabled = std::env::var("NIGHTHOUSE_NO_CGC_INCREASE").is_ok();
++
+         if let Some(cgc_from_cli) = node_custody_type.get_custody_count_override(spec) {
+             debug!(
+                 ?node_custody_type,
+@@ -307,7 +315,7 @@ impl<E: EthSpec> CustodyContext<E> {
+                 "Initialising from persisted custody context"
+             );
+ 
+-            if cgc_from_cli > validator_custody_at_head {
++            if cgc_from_cli > validator_custody_at_head && !cgc_increase_disabled {
+                 // Make the CGC from CLI effective from the next epoch
+                 let effective_epoch = head_epoch + 1;
+                 let old_custody_group_count = validator_custody_at_head;
+@@ -400,6 +408,11 @@ impl<E: EthSpec> CustodyContext<E> {
          current_slot: Slot,
          spec: &ChainSpec,
      ) -> Option<CustodyCountChanged> {
