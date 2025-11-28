@@ -1,153 +1,137 @@
-# eth-client-docker-image-builder
+# nighthouse-builder
 
-Automates docker builds for ethereum clients. The build process is scheduled every hour to check source repositories for new commits.
+`nighthouse-builder` is an automated build pipeline for producing **Nighthouse** Docker images — a minimally modified fork of the Ethereum consensus client **Lighthouse**.
 
-## Build image on demand
+Nighthouse introduces an operator-controlled option to **disable blob custody group count (CGC) increases**, reducing hardware and memory requirements at the cost of being **non-compliant** with Ethereum's protocol intentions. This makes it a *bad client*, beneficial only for operators who explicitly choose performance over network health.
 
-Run the *Build **client*** workflow;
-- [Build Besu](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-besu.yml) [[source](https://github.com/hyperledger/besu)]
-- [Build Eleel](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-eleel.yml) [[source](https://github.com/sigp/eleel)]
-- [Build Erigon](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-erigon.yml) [[source](https://github.com/ledgerwatch/erigon)]
-- [Build EthereumJS](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-ethereumjs.yml) [[source](https://github.com/ethereumjs/ethereumjs-monorepo)]
-- [Build Ethrex](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-ethrex.yml) [[source](https://github.com/lambdaclass/ethrex)]
-- [Build Geth](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-geth.yml) [[source](https://github.com/ethereum/go-ethereum)]
-- [Build Lighthouse](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-lighthouse.yml) [[source](https://github.com/sigp/lighthouse)]
-- [Build Lodestar](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-lodestar.yml) [[source](https://github.com/chainsafe/lodestar)]
-- [Build Nethermind](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-nethermin.yml) [[source](https://github.com/nethermindeth/nethermind)]
-- [Build Nimbus-Eth2](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-nimbus-eth2.yml) [[source](https://github.com/status-im/nimbus-eth2)]
-- [Build Nimbus-Eth1](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-nimbus-eth1.yml) [[source](https://github.com/status-im/nimbus-eth1)]
-- [Build Prysm](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-prysm.yml) [[source](https://github.com/offchainlabs/prysm)]
-- [Build Reth](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-reth.yml) [[source](https://github.com/paradigmxyz/reth)]
-- [Build Teku](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-teku.yml) [[source](https://github.com/consensys/teku)]
-- [Build Grandine](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-grandine.yml) [[source](https://github.com/grandinetech/grandine)]
-- [Build Zeam](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-zeam.yml) [[source](https://github.com/blockblaz/zeam)]
-- [Build Ream](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-ream.yml) [[source](https://github.com/ReamLabs/ream)]
+This repository:
 
-Run the *Build **tooling*** workflow;
-- [Build Eth-DAS-Guardian](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-eth-das-guardian.yml) [[source](https://github.com/probe-lab/eth-das-guardian)]
-- [Build Flashbots Builder](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-flashbots-builder.yml) [[source](https://github.com/flashbots/builder)]
-- [Build tx-fuzz](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-tx-fuzz.yaml) [[source](https://github.com/MariusVanDerWijden/tx-fuzz)]
-- [Build consesnus-monitor](https://github.com/ethpandaops/eth-client-docker-image-builder/blob/master/.github/workflows/build-push-consensus-monitor.yml) [[source](https://github.com/ralexstokes/ethereum_consensus_monitor)]
-- [Build execution-monitor](https://github.com/ethpandaops/eth-client-docker-image-builder/blob/master/.github/workflows/build-push-execution-monitor.yml) [[source](https://github.com/ethereum/nodemonitor)]
-- [Build beacon-metrics-gazer](https://github.com/ethpandaops/eth-client-docker-image-builder/blob/master/.github/workflows/build-push-beacon-metrics-gazer.yml) [[source](https://github.com/dapplion/beacon-metrics-gazer)]
-- [Build goomy-blob](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-goomy-blob.yaml) [[source](https://github.com/ethpandaops/goomy-blob)]
-- [Build ethereum-genesis-generator](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-genesis-generator.yml) [[source](https://github.com/ethpandaops/ethereum-genesis-generator)]
-- [Build mev-rs](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-mev-rs.yml) [[source](https://github.com/ralexstokes/mev-rs)]
-- [Build reth-rbuilder](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-reth-rbuilder.yml) [[source](https://github.com/flashbots/rbuilder)]
-- [Build Syncoor](https://github.com/ethpandaops/eth-client-docker-image-builder/actions/workflows/build-push-syncoor.yml) [[source](https://github.com/ethpandaops/syncoor)]
+- Contains the Nighthouse patch
+- Applies it to upstream Lighthouse during CI
+- Automatically builds Docker images
+- Publishes them to **Docker Hub** at:
 
-## Adding a new image to build on schedule
-
-Add a new image to [`config.yaml`](./config.yaml) file and it will be built on schedule from [this workflow](https://github.com/ethpandaops/eth-client-docker-image-builder/blob/master/.github/workflows/scheduled.yml).
-
-```yaml
-- source:
-    repository: sigp/lighthouse # source repository to build from
-    ref: stable # source repository branch/tag/commit to build from
-  build_script: ./teku/build.sh # optional build script to run INSTEAD of the docker build & push (see below)
-  target:
-    tag: stable # tag to add to the docker image tag, this must be unique for each docker hub repository
-    repository: ethpandaops/lighthouse # dockerhub target to deploy the built image
-    dockerfile: ./lighthouse/Dockerfile # optional docker file to use, defaults to the source repository's Dockerfile
+```
+ethnight/nighthouse
 ```
 
-## Output image tags
+👉 https://hub.docker.com/r/ethnight/nighthouse
 
-Take the following config;
+---
 
-```yaml
-- source:
-    repository: sigp/lighthouse
-    ref: stable
-  target:
-    tag: banana
-    repository: ethpandaops/lighthouse
+## ⚠️ Important Disclaimer
+
+Running Nighthouse harms Ethereum’s data-availability assumptions.  
+It should **not** be used on mainnet by responsible operators.
+
+You are solely responsible for any usage of Nighthouse.
+
+---
+
+## What the Patch Does
+
+The Nighthouse patch adds a single behavioral toggle:
+
+### Disable Custody Group Count Increases  
+When the `NIGHTHOUSE_NO_CGC_INCREASE` environment variable is present, all CGC-increase logic returns early and does nothing.
+
+Example of the applied guard in the patch:
+
+```rust
+if std::env::var("NIGHTHOUSE_NO_CGC_INCREASE").is_ok() {
+    return None;
+}
 ```
 
-This would produce the following docker image tags;
+This prevents Lighthouse from scaling custody requirements based on network conditions.
 
-```yaml
-# the tag by itself to have the latest build
-ethpandaops/lighthouse:banana
-# the tag and the source repository's commit hash
-ethpandaops/lighthouse:banana-abcd123
+---
+
+## How the Builder Pipeline Works
+
+The GitHub Action:
+
+1. Clones upstream Lighthouse
+2. Checks out the chosen tag/commit
+3. Applies `nighthouse/01-disable-cgc-update.patch`
+4. Builds Lighthouse with Rust in CI
+5. Produces a Docker image
+6. Pushes it to **Docker Hub** under:
+
+```
+ethnight/nighthouse:<tag>
 ```
 
-## How does the `build_script` work?
+Images include both `latest` and versioned tags.
 
-The `build_script` is a bash script that is run INSTEAD of the docker build & push. This is useful for clients that have a custom build process.
+---
 
-When the `build_script` is set, you **must** build and push the docker image yourself! Docker will already be logged in to the target repository. You **should** try to use the `target_tag` and `target_repository` environment variables to tag your image.
+## Using the Docker Images
 
-The following environment variables are available to the `build_script`;
-- `source_repository` - source repository to build from
-- `source_ref` - source repository branch/tag/commit to build from
-- `target_tag` - tag to add to the docker image tag
-- `target_repository` - dockerhub target to deploy the built image
-- `target_dockerfile` - optional docker file to use, defaults to the source repository's Dockerfile
-- `source_git_commit_hash` - the source repository's short commit hash
-- `source_git_commit_hash_full` - the source repository's full commit hash
+### Run with dynamic CGC increases **disabled** (Nighthouse mode)
 
-Example `build_script` file;
-```bash
-#!/bin/bash
-
-# helper to get source directory
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-cd ${SCRIPT_DIR}/../source
-
-# do something here that requires this custom build script
-# ...
-
-# finally build with the tags from the dockerfile
-docker build -t "${target_repository}:${target_tag}" -t "${target_repository}:${target_tag}-${source_git_commit_hash}" -f "../${target_dockerfile}" .
-
-# push the image tags
-docker push "${target_repository}:${target_tag}"
-docker push "${target_repository}:${target_tag}-${source_git_commit_hash}"
+```
+docker run -e NIGHTHOUSE_NO_CGC_INCREASE=1 \
+    ethnight/nighthouse:latest \
+    lighthouse bn --network mainnet
 ```
 
-## Additional Configuration Files
-Our image building process utilizes two additional configuration files: [`platforms.yaml`](./platforms.yaml) and [`runners.yaml`](./runners.yaml). These files help in determining the platforms for which docker images should be built and specifying the runners to use for those platforms, respectively.
+### Run with Lighthouse’s default behavior (CGC increases enabled)
 
-### [`platforms.yaml`](./platforms.yaml)
-This configuration determines the platforms for which each client will have a Docker image built.
-
-Sample Content:
-```yaml
-besu:
-  - linux/amd64
-lighthouse:
-  - linux/amd64
-  - linux/arm64
 ```
-In the example above, the client 'besu' and 'lighthouse' are both configured to have Docker images built for the linux/amd64 platform. While 'lighthouse' is also configured to have Docker images built for the linux/arm64 platform.
-
-### [`runners.yaml`](./runners.yaml)
-This configuration maps platforms to GitHub Action runners. It tells our workflow which runner should be used when building a Docker image for a specific platform.
-
-Sample Content:
-```yaml
-linux/amd64: ubuntu-latest
-linux/arm64: self-hosted
+docker run \
+    ethnight/nighthouse:latest \
+    lighthouse bn --network mainnet
 ```
 
-In this example, the platform linux/amd64 will use the ubuntu-latest runner, while darwin/arm64 will use the self-hosted runner.
+---
 
-## Lint locally
+## Environment Variables
 
-Requirements;
-- Python 3.6+
-- [Yamale](https://github.com/23andMe/Yamale)
-- [yq](https://github.com/mikefarah/yq)
+| Variable                     | Purpose                                                |
+|------------------------------|--------------------------------------------------------|
+| `NIGHTHOUSE_NO_CGC_INCREASE` | If set to *anything*, disables CGC increases entirely |
+
+Example:
+
+```
+export NIGHTHOUSE_NO_CGC_INCREASE=1
+docker compose up
+```
+
+---
+
+## Local Development or Manual Builds
+
+Clone the repo:
+
+```
+git clone https://github.com/<your-org>/nighthouse-builder.git
+cd nighthouse-builder
+```
+
+Apply the patch manually if working with Lighthouse directly:
 
 ```bash
-# make sure yamale is installed
-pip install yamale
-
-# yamale lint
-yamale -s schema.yaml config.yaml
-
-# check unique target tag, should return []
-yq 'group_by(.target.repository + ":" + .target.tag) | map(select(length>1))' config.yaml
+git apply 01-disable-cgc-update.patch
 ```
+
+Build Lighthouse:
+
+```bash
+cargo build --release
+```
+
+---
+
+## License
+
+Patched Lighthouse code follows Lighthouse’s original license.  
+Build scripts and workflows in this repo are MIT-licensed unless stated otherwise.
+
+---
+
+## Contributions
+
+This project is intended for experimentation and research.  
+PRs improving the builder or documentation are welcome.
