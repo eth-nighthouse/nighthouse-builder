@@ -58,7 +58,7 @@ def generate_config():
             continue
 
         # Get default repository for this client
-        default_repo = DEFAULT_REPOS.get(client_name, f"eth-nighthouse/{client_name}")
+        default_repo = DEFAULT_REPOS.get(client_name, f"ethnight/{client_name}")
 
         # Process main branches
         if 'branches' in client_config:
@@ -270,7 +270,7 @@ def process_branch(client_name, source_repo, branch, target_tag, config_list):
         },
         'target': {
             'tag': target_tag,
-            'repository': f'eth-nighthouse/{client_name}'
+            'repository': f'ethnight/{client_name}'
         }
     }
 
@@ -301,7 +301,7 @@ def process_branch_custom(client_name, source_repo, branch, target_tag, config_l
         },
         'target': {
             'tag': target_tag,
-            'repository': f'eth-nighthouse/{client_name}'
+            'repository': f'ethnight/{client_name}'
         }
     }
     
