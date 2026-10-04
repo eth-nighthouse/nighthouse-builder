@@ -187,6 +187,8 @@ jobs:
     needs: check
     if: ${{ needs.check.outputs.configs != '[]' && needs.check.outputs.configs != '' }}
     uses: ./.github/workflows/deploy.yml
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:

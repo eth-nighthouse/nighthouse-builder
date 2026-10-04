@@ -1,0 +1,62 @@
+name: Record build
+description: Commit the source commit hash of the last built image to a file in this repository
+
+inputs:
+  tag:
+    description: The docker tag that was built (used as the key in the file)
+    type: string
+    required: true
+  commit:
+    description: The full source commit hash the image was built from
+    type: string
+    required: true
+  file:
+    description: The file in this repository to record the commit hash in
+    type: string
+    default: last-built-commit
+    required: false
+
+runs:
+  using: composite
+  steps:
+  - name: Commit last built commit hash
+    shell: bash
+    env:
+      TAG: ${{ inputs.tag }}
+      COMMIT: ${{ inputs.commit }}
+      FILE: ${{ inputs.file }}
+      BRANCH: ${{ github.ref_name }}
+    run: |
+      if [[ -z "$TAG" || -z "$COMMIT" ]]; then
+        echo "::error::tag and commit are required (tag='$TAG', commit='$COMMIT')"
+        exit 1
+      fi
+
+      git config user.name "github-actions[bot]"
+      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Other builds may push at the same time, so rebuild the change on top of the
+      # latest branch head on every attempt instead of rebasing.
+      for attempt in 1 2 3 4 5; do
+        git fetch origin "$BRANCH"
+        git reset --hard "origin/$BRANCH"
+
+        touch "$FILE"
+        { grep -v "^${TAG}: " "$FILE" || true; echo "${TAG}: ${COMMIT}"; } | sort > "$FILE.new"
+        mv "$FILE.new" "$FILE"
+
+        git add "$FILE"
+        if git diff --cached --quiet -- "$FILE"; then
+          echo "$FILE already records ${TAG}: ${COMMIT}"
+          exit 0
+        fi
+
+        git commit -m "Record last built ${TAG} commit ${COMMIT:0:7}"
+        if git push origin "HEAD:$BRANCH"; then
+          exit 0
+        fi
+        sleep $((attempt * 5))
+      done
+
+      echo "::error::Failed to push $FILE after 5 attempts"
+      exit 1

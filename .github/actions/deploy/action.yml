@@ -102,9 +102,21 @@ runs:
   - name: Apply patch to source repository
     shell: bash
     if: inputs.source_patch
+    env:
+      PATCH_FILE: ${{ github.workspace }}/${{ inputs.source_patch }}
     run: |
       cd source
-      patch -p 1 < ../${{ inputs.source_patch }}
+      if git apply --check "$PATCH_FILE" 2>/dev/null; then
+        git apply "$PATCH_FILE"
+      elif git apply --3way "$PATCH_FILE"; then
+        # The patch context no longer matches upstream, but git could merge it using
+        # the original file version from the source history (blob ids in the patch).
+        echo "::warning::${{ inputs.source_patch }} applied via 3-way merge, consider regenerating it against ${{ inputs.source_ref }}"
+        git diff --stat HEAD
+      else
+        echo "::error::${{ inputs.source_patch }} does not apply to ${{ inputs.source_repository }}#${{ inputs.source_ref }}"
+        exit 1
+      fi
   - name: Set up Docker Context for Buildx
     shell: bash
     id: buildx-context

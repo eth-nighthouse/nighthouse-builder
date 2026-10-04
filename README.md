@@ -53,7 +53,7 @@ The GitHub Action:
 
 1. Clones upstream Lighthouse
 2. Checks out the chosen tag/commit
-3. Applies `nighthouse/01-disable-cgc-update.patch`
+3. Applies `nighthouse/01-disable-cgc-update.patch` with `git apply`, falling back to a 3-way merge against the upstream history when the surrounding code has moved (the build fails if neither works)
 4. Builds Lighthouse with Rust in CI
 5. Produces a Docker image
 6. Pushes it to **Docker Hub** under:
@@ -62,7 +62,21 @@ The GitHub Action:
 ethnight/nighthouse:<tag>
 ```
 
+7. Commits the upstream commit hash of the built image to `last-built-commit` (one `<tag>: <commit>` line per tag)
+
 Images include both `latest` and versioned tags.
+
+The commit in step 7 also keeps the repository active, so GitHub doesn't disable the scheduled workflow after 60 days without activity.
+
+### Updating the patch
+
+Keep the patch small, with as few hunks and context lines as possible. To regenerate it, apply your change in a Lighthouse checkout and run:
+
+```bash
+git diff --full-index -U2 > ../nighthouse-builder/nighthouse/01-disable-cgc-update.patch
+```
+
+`--full-index` records the full blob ids, which is what lets the 3-way fallback work when upstream changes the code around the patch.
 
 ---
 
@@ -113,7 +127,7 @@ cd nighthouse-builder
 Apply the patch manually if working with Lighthouse directly:
 
 ```bash
-git apply 01-disable-cgc-update.patch
+git apply ../nighthouse-builder/nighthouse/01-disable-cgc-update.patch
 ```
 
 Build Lighthouse:
